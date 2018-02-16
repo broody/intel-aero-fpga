@@ -42,7 +42,7 @@ set_global_assignment -name DEVICE 10M08SAM153I7G
 set_global_assignment -name TOP_LEVEL_ENTITY Top
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 16.1.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "12:28:15  DECEMBER 09, 2016"
-set_global_assignment -name LAST_QUARTUS_VERSION 16.0.0
+set_global_assignment -name LAST_QUARTUS_VERSION "17.1.0 Lite Edition"
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP "-40"
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 100
 set_global_assignment -name DEVICE_FILTER_PACKAGE MBGA
@@ -56,12 +56,12 @@ set_global_assignment -name VERILOG_FILE RTL/spi_slave.v
 set_global_assignment -name VERILOG_FILE RTL/i2c_bridge_new.v
 set_global_assignment -name VERILOG_FILE RTL/i2c_slave.v
 set_global_assignment -name VERILOG_FILE RTL/adc.v
+set_global_assignment -name VERILOG_FILE RTL/pwm.v
+set_global_assignment -name VERILOG_FILE RTL/uart.v
+set_global_assignment -name VERILOG_FILE RTL/i2c_master.v
 set_global_assignment -name QIP_FILE adc/synthesis/adc.qip
 set_global_assignment -name QIP_FILE pll/pll.qip
 set_global_assignment -name SDC_FILE Top.sdc
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 
 ## 25MHz clock
 set_location_assignment PIN_J5 -to in_CLK
@@ -124,11 +124,39 @@ set_location_assignment PIN_H12 -to SPI_SCLK
 set_location_assignment PIN_J12 -to SPI_MOSI
 set_location_assignment PIN_H11 -to SPI_MISO
 set_location_assignment PIN_H13 -to SPI_SS
+
+
+## IO Expansion board related FPGA pins
+set_location_assignment PIN_K4 -to FPGA_GPIO_OUTPUT[3]
+set_location_assignment PIN_K5 -to FPGA_GPIO_OUTPUT[2]
+set_location_assignment PIN_J4 -to FPGA_GPIO_OUTPUT[1]
+set_location_assignment PIN_B13 -to FPGA_GPIO_OUTPUT[0]
+
+set_location_assignment PIN_M9 -to FPGA_GPIO_INPUT[0]
+set_location_assignment PIN_L9 -to FPGA_GPIO_INPUT[1]
+
+set_location_assignment PIN_R14 -to FPGA_PWM_OUT[1]
+set_location_assignment PIN_P15 -to FPGA_PWM_OUT[0]
+
+set_location_assignment PIN_M14 -to FPGA_UART_TX
+set_location_assignment PIN_L15 -to FPGA_UART_RX
+
+set_location_assignment PIN_R11 -to FPGA_I2C_SDA
+set_location_assignment PIN_P12 -to FPGA_I2C_SCL
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to FPGA_I2C_SDA
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to FPGA_I2C_SCL
+
+
+
+
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SPI_SCLK
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SPI_MOSI
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SPI_MISO
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SPI_SS
-
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to BOOTLOADER_FORCE_PIN
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to in_CLK
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FC1_I2C_CLK
@@ -159,6 +187,20 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to IO_TELEM_I2C_CLK
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to IO_TELEM_I2C_SDA
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FC1_COMPASS_CLK
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FC1_COMPASS_SDA
-
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FPGA_GPIO_OUTPUT[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FPGA_GPIO_OUTPUT[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FPGA_GPIO_OUTPUT[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FPGA_GPIO_OUTPUT[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FPGA_GPIO_OUTPUT
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FPGA_PWM_OUT[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FPGA_PWM_OUT[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FPGA_PWM_OUT
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FPGA_I2C_SCL
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FPGA_I2C_SDA
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FPGA_UART_RX
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FPGA_UART_TX
+set_instance_assignment -name IO_STANDARD "3.3 V SCHMITT TRIGGER" -to FPGA_GPIO_INPUT[0]
+set_instance_assignment -name IO_STANDARD "3.3 V SCHMITT TRIGGER" -to FPGA_GPIO_INPUT[1]
+set_instance_assignment -name IO_STANDARD "3.3 V SCHMITT TRIGGER" -to FPGA_GPIO_INPUT
 
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

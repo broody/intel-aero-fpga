@@ -27,6 +27,11 @@ module adc_state_machine(
     clk_adc,
     i2c_clk,
     i2c_sda,
+    adc_chan0,
+    adc_chan1,
+    adc_chan2,
+    adc_chan3,
+    adc_chan4,
     reset_n,
     locked
 );
@@ -42,6 +47,12 @@ inout wire i2c_sda;
 input wire reset_n;
 input wire locked;
 
+output reg [15:0] adc_chan0;
+output reg [15:0] adc_chan1;
+output reg [15:0] adc_chan2;
+output reg [15:0] adc_chan3;
+output reg [15:0] adc_chan4;
+
 wire adc_response_valid;
 
 wire [11:0] adc_response_data;
@@ -53,11 +64,6 @@ reg [11:0] adc_ch3_raw_data;
 reg [11:0] adc_ch4_raw_data;
 wire adc_response_startofpacket;
 wire adc_response_endofpacket;
-reg [7:0] reg_ch0_upper, reg_ch0_lower;
-reg [7:0] reg_ch1_upper, reg_ch1_lower;
-reg [7:0] reg_ch2_upper, reg_ch2_lower;
-reg [7:0] reg_ch3_upper, reg_ch3_lower;
-reg [7:0] reg_ch4_upper, reg_ch4_lower;
 
 reg adc_sequencer_csr_address = 1'd0;
 reg adc_sequencer_csr_read = 1'd0;
@@ -110,11 +116,12 @@ always @(posedge clk_core) begin
          * this avoids a non-syncronized read between lower and upper bytes.
          */
         if (!slave_asserted) begin
-            { reg_ch0_upper, reg_ch0_lower } <= { 4'b0, adc_ch0_raw_data[11:0] };
-            { reg_ch1_upper, reg_ch1_lower } <= { 4'b0, adc_ch1_raw_data[11:0] };
-            { reg_ch2_upper, reg_ch2_lower } <= { 4'b0, adc_ch2_raw_data[11:0] };
-            { reg_ch3_upper, reg_ch3_lower } <= { 4'b0, adc_ch3_raw_data[11:0] };
-            { reg_ch4_upper, reg_ch4_lower } <= { 4'b0, adc_ch4_raw_data[11:0] };
+            adc_chan0 <= { 4'b0, adc_ch0_raw_data[11:0] };
+            adc_chan1 <= { 4'b0, adc_ch1_raw_data[11:0] };
+            adc_chan2 <= { 4'b0, adc_ch2_raw_data[11:0] };
+            adc_chan3 <= { 4'b0, adc_ch3_raw_data[11:0] };
+            adc_chan4 <= { 4'b0, adc_ch4_raw_data[11:0] };
+                        
             samples_ready <= 1'd0;
         end
     end
@@ -176,25 +183,25 @@ always @(posedge clk_core) begin
                 8'd0:
                     slave_tx_buffer <= adc_config_reg;
                 8'd3:
-                    slave_tx_buffer <= reg_ch0_lower;
+                    slave_tx_buffer <= adc_chan0[7:0];
                 8'd4:
-                    slave_tx_buffer <= reg_ch0_upper;
+                    slave_tx_buffer <= adc_chan0[15:8];
                 8'd5:
-                    slave_tx_buffer <= reg_ch1_lower;
+                    slave_tx_buffer <= adc_chan1[7:0];
                 8'd6:
-                    slave_tx_buffer <= reg_ch1_upper;
+                    slave_tx_buffer <= adc_chan1[15:8];
                 8'd7:
-                    slave_tx_buffer <= reg_ch2_lower;
+                    slave_tx_buffer <= adc_chan2[7:0];
                 8'd8:
-                    slave_tx_buffer <= reg_ch2_upper;
+                    slave_tx_buffer <= adc_chan2[15:8];
                 8'd9:
-                    slave_tx_buffer <= reg_ch3_lower;
+                    slave_tx_buffer <= adc_chan3[7:0];
                 8'd10:
-                    slave_tx_buffer <= reg_ch3_upper;
+                    slave_tx_buffer <= adc_chan3[15:8];
                 8'd11:
-                    slave_tx_buffer <= reg_ch4_lower;
+                    slave_tx_buffer <= adc_chan4[7:0];
                 8'd12:
-                    slave_tx_buffer <= reg_ch4_upper;
+                    slave_tx_buffer <= adc_chan4[15:8];
                 default:
                     slave_tx_buffer <= 8'd0;
                 endcase;
